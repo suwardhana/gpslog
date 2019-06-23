@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:async';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import '../fchat.dart';
 
 class BottomWidget extends StatefulWidget {
   BottomWidget({Key key}) : super(key: key);
@@ -16,10 +14,7 @@ class _BottomWidgetState extends State<BottomWidget> {
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: Home',
-      style: optionStyle,
-    ),
+    ChatScreen(),
     Text(
       'Index 1: Business',
       style: optionStyle,
@@ -65,28 +60,6 @@ class _BottomWidgetState extends State<BottomWidget> {
   }
 }
 
-GoogleSignIn _googleSignIn = GoogleSignIn(
-  scopes: <String>[
-    'email',
-    'https://www.googleapis.com/auth/contacts.readonly',
-  ],
-);
-final _auth = FirebaseAuth.instance;
-
-Future<FirebaseUser> _handleSignIn() async {
-  final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-  final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-  final AuthCredential credential = GoogleAuthProvider.getCredential(
-    accessToken: googleAuth.accessToken,
-    idToken: googleAuth.idToken,
-  );
-
-  final FirebaseUser user = await _auth.signInWithCredential(credential);
-  print("signed in " + user.displayName);
-  return user;
-}
-
 class TesWidget extends StatefulWidget {
   TesWidget({Key key}) : super(key: key);
 
@@ -115,12 +88,6 @@ class _TesWidgetState extends State<TesWidget> {
           Text(
             '$_counter',
             style: Theme.of(context).textTheme.display1,
-          ),
-          RaisedButton(
-            onPressed: () async {
-              _handleSignIn();
-            },
-            child: const Text('Sign in with Google'),
           ),
           RaisedButton(
             onPressed: () async {
