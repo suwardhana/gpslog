@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../fchat.dart';
+import '../location_stream.dart';
 
 class BottomWidget extends StatefulWidget {
   BottomWidget({Key key}) : super(key: key);
@@ -15,10 +16,7 @@ class _BottomWidgetState extends State<BottomWidget> {
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   List<Widget> _widgetOptions = <Widget>[
     ChatScreen(),
-    Text(
-      'Index 1: Business',
-      style: optionStyle,
-    ),
+    LocationStreamWidget(),
     TesWidget(),
   ];
 
