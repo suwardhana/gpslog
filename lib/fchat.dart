@@ -33,10 +33,10 @@ Future<FirebaseUser> _handleSignIn() async {
   return user2;
 }
 
-Future<FirebaseUser> _ensureSignIn() async {
+void _ensureSignIn() async {
   GoogleSignInAccount user = _googleSignIn.currentUser;
   if (user == null) {
-    _handleSignIn();
+    await _handleSignIn();
   }
 }
 
@@ -120,35 +120,31 @@ class ChatScreenState extends State<ChatScreen> {
     return new IconTheme(
       data: new IconThemeData(color: Theme.of(context).accentColor),
       child: new Container(
-          margin: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: new Row(children: <Widget>[
-            new Flexible(
-              child: new TextField(
-                controller: _textController,
-                onChanged: (String text) {
-                  setState(() {
-                    _isComposing = text.length > 0;
-                  });
-                },
-                onSubmitted: _handleSubmitted,
-                decoration:
-                    new InputDecoration.collapsed(hintText: "Send a message"),
-              ),
+        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: new Row(children: <Widget>[
+          new Flexible(
+            child: new TextField(
+              controller: _textController,
+              onChanged: (String text) {
+                setState(() {
+                  _isComposing = text.length > 0;
+                });
+              },
+              onSubmitted: _handleSubmitted,
+              decoration:
+                  new InputDecoration.collapsed(hintText: "Send a message"),
             ),
-            new Container(
-                margin: new EdgeInsets.symmetric(horizontal: 4.0),
-                child: new IconButton(
-                  icon: new Icon(Icons.send),
-                  onPressed: _isComposing
-                      ? () => _handleSubmitted(_textController.text)
-                      : null,
-                )),
-          ]),
-          decoration: Theme.of(context).platform == TargetPlatform.iOS
-              ? new BoxDecoration(
-                  border:
-                      new Border(top: new BorderSide(color: Colors.grey[200])))
-              : null),
+          ),
+          new Container(
+              margin: new EdgeInsets.symmetric(horizontal: 4.0),
+              child: new IconButton(
+                icon: new Icon(Icons.send),
+                onPressed: _isComposing
+                    ? () => _handleSubmitted(_textController.text)
+                    : null,
+              )),
+        ]),
+      ),
     );
   }
 
@@ -157,7 +153,7 @@ class ChatScreenState extends State<ChatScreen> {
     setState(() {
       _isComposing = false;
     });
-    await _ensureSignIn();
+    _ensureSignIn();
     _sendMessage(text: text);
   }
 
