@@ -5,7 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-final ThemeData kDefaultTheme = new ThemeData(
+final ThemeData kDefaultTheme = ThemeData(
   primarySwatch: Colors.purple,
   accentColor: Colors.orangeAccent[400],
 );
@@ -49,29 +49,29 @@ class ChatMessage extends StatelessWidget {
   final Animation animation;
 
   Widget build(BuildContext context) {
-    return new SizeTransition(
-      sizeFactor: new CurvedAnimation(parent: animation, curve: Curves.easeOut),
+    return SizeTransition(
+      sizeFactor: CurvedAnimation(parent: animation, curve: Curves.easeOut),
       axisAlignment: 0.0,
-      child: new Container(
+      child: Container(
         margin: const EdgeInsets.symmetric(vertical: 10.0),
-        child: new Row(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            new Container(
+            Container(
               margin: const EdgeInsets.only(right: 16.0),
-              child: new CircleAvatar(
+              child: CircleAvatar(
                   backgroundImage:
-                      new NetworkImage(snapshot.value['senderPhotoUrl'])),
+                      NetworkImage(snapshot.value['senderPhotoUrl'])),
             ),
-            new Expanded(
-              child: new Column(
+            Expanded(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  new Text(snapshot.value['senderName'],
+                  Text(snapshot.value['senderName'],
                       style: Theme.of(context).textTheme.subhead),
-                  new Container(
+                  Container(
                     margin: const EdgeInsets.only(top: 5.0),
-                    child: new Text(snapshot.value['text']),
+                    child: Text(snapshot.value['text']),
                   ),
                 ],
               ),
@@ -85,45 +85,45 @@ class ChatMessage extends StatelessWidget {
 
 class ChatScreen extends StatefulWidget {
   @override
-  State createState() => new ChatScreenState();
+  State createState() => ChatScreenState();
 }
 
 class ChatScreenState extends State<ChatScreen> {
-  final TextEditingController _textController = new TextEditingController();
+  final TextEditingController _textController = TextEditingController();
   bool _isComposing = false;
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-        body: new Column(children: <Widget>[
-      new Flexible(
-        child: new FirebaseAnimatedList(
+    return Scaffold(
+        body: Column(children: <Widget>[
+      Flexible(
+        child: FirebaseAnimatedList(
           query: reference,
           sort: (a, b) => b.key.compareTo(a.key),
-          padding: new EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(8.0),
           reverse: true,
           itemBuilder: (_, DataSnapshot snapshot, Animation<double> animation,
               int index) {
-            return new ChatMessage(snapshot: snapshot, animation: animation);
+            return ChatMessage(snapshot: snapshot, animation: animation);
           },
         ),
       ),
-      new Divider(height: 1.0),
-      new Container(
-        decoration: new BoxDecoration(color: Theme.of(context).cardColor),
+      Divider(height: 1.0),
+      Container(
+        decoration: BoxDecoration(color: Theme.of(context).cardColor),
         child: _buildTextComposer(),
       ),
     ]));
   }
 
   Widget _buildTextComposer() {
-    return new IconTheme(
-      data: new IconThemeData(color: Theme.of(context).accentColor),
-      child: new Container(
+    return IconTheme(
+      data: IconThemeData(color: Theme.of(context).accentColor),
+      child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: new Row(children: <Widget>[
-          new Flexible(
-            child: new TextField(
+        child: Row(children: <Widget>[
+          Flexible(
+            child: TextField(
               controller: _textController,
               onChanged: (String text) {
                 setState(() {
@@ -131,14 +131,13 @@ class ChatScreenState extends State<ChatScreen> {
                 });
               },
               onSubmitted: _handleSubmitted,
-              decoration:
-                  new InputDecoration.collapsed(hintText: "Send a message"),
+              decoration: InputDecoration.collapsed(hintText: "Send a message"),
             ),
           ),
-          new Container(
-              margin: new EdgeInsets.symmetric(horizontal: 4.0),
-              child: new IconButton(
-                icon: new Icon(Icons.send),
+          Container(
+              margin: EdgeInsets.symmetric(horizontal: 4.0),
+              child: IconButton(
+                icon: Icon(Icons.send),
                 onPressed: _isComposing
                     ? () => _handleSubmitted(_textController.text)
                     : null,
