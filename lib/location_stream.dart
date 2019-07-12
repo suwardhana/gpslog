@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import './elements/placeholder_widget.dart';
 
@@ -140,8 +141,12 @@ class LocationStreamState extends State<LocationStreamWidget> {
           LocationOptions(accuracy: LocationAccuracy.best, distanceFilter: 10);
       final Stream<Position> positionStream =
           Geolocator().getPositionStream(locationOptions);
-      _positionStreamSubscription = positionStream.listen(
-          (Position position) => setState(() => _positions.add(position)));
+      _positionStreamSubscription = positionStream.listen((Position position) {
+        setState(() {
+          _positions.add(position);
+        });
+        _pushLocation(position, getUsername());
+      });
       _positionStreamSubscription.pause();
     }
 
@@ -152,6 +157,12 @@ class LocationStreamState extends State<LocationStreamWidget> {
         _positionStreamSubscription.pause();
       }
     });
+  }
+
+  getUsername() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var _username = prefs.getString('username').toString() ?? "";
+    return _username;
   }
 
   @override
@@ -213,6 +224,35 @@ class LocationStreamState extends State<LocationStreamWidget> {
 
   Color _determineButtonColor() {
     return _isListening() ? Colors.red : Colors.green;
+  }
+
+  Future<Null> _pushLocation(Position position, String username) async {
+    List titik = [
+      [-2.986844, 104.732186, "Gerbang Unsri Palembang"],
+      [-2.989663, 104.735224, "Simpang Padang Selasa"],
+      [-2.992716, 104.726864, "Simpang SMA 10"],
+      [-2.986910, 104.721923, "Jalan Parameswara"],
+      [-3.017649, 104.720889, "Jembatan Musi II"],
+      [-3.047131, 104.744160, "Simpang Kertapati"],
+      [-3.089733, 104.725442, "Simpang Pemulutan"],
+      [-3.179613, 104.678130, "Gerbang Indralaya"],
+      [-3.200429, 104.656830, "Simpang Timbangan"],
+      [-3.210573, 104.648692, "Gerbang Unsri Indralaya"],
+    ];
+
+    for (var i = 0; i < titik.length; i++) {
+      double distanceInMeters = await Geolocator().distanceBetween(
+          titik[i][0], titik[i][1], position.latitude, position.longitude);
+      if (distanceInMeters < 150) {
+        reference.push().set({
+          'time': position.timestamp.toLocal().toString(),
+          'username': username,
+          'nearestradius': titik[i][3],
+          'latitude': position.latitude,
+          'longitude': position.longitude,
+        });
+      }
+    }
   }
 }
 

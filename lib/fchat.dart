@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final ThemeData kDefaultTheme = ThemeData(
   primarySwatch: Colors.purple,
@@ -30,7 +31,13 @@ Future<FirebaseUser> _handleSignIn() async {
 
   final FirebaseUser user2 = await _auth.signInWithCredential(credential);
   print("signed in " + user2.displayName);
+  await setUsername(user2.displayName);
   return user2;
+}
+
+setUsername(String _username) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('lastlogin', _username);
 }
 
 void _ensureSignIn() async {
