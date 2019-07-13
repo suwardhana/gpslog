@@ -54,6 +54,24 @@ class ChatMessage extends StatelessWidget {
   ChatMessage({this.snapshot, this.animation});
   final DataSnapshot snapshot;
   final Animation animation;
+  Widget _gambar(String poin) {
+    int poin2 = int.parse(poin);
+    var level;
+    level = poin2 / 10;
+    // debugPrint("level awal = " + level.toString());
+    level = level.toInt();
+    if (level < 1) {
+      level = 1;
+    }
+    if (level > 9) {
+      level = 9;
+    }
+    debugPrint('badge/lvl' + level.toString() + '.png');
+    return Image.asset(
+      'badge/lvl' + level.toString() + '.png',
+      width: 25.0,
+    );
+  }
 
   Widget build(BuildContext context) {
     return SizeTransition(
@@ -64,18 +82,22 @@ class ChatMessage extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Container(
-              margin: const EdgeInsets.only(right: 16.0),
-              child: CircleAvatar(
+            Stack(alignment: AlignmentDirectional.bottomEnd, children: <Widget>[
+              CircleAvatar(
                   backgroundImage:
                       NetworkImage(snapshot.value['senderPhotoUrl'])),
-            ),
+              _gambar(snapshot.value['currentPoint'].toString()),
+            ]),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(snapshot.value['senderName'],
-                      style: Theme.of(context).textTheme.subhead),
+                  Row(
+                    children: <Widget>[
+                      Text(snapshot.value['senderName'],
+                          style: Theme.of(context).textTheme.subhead),
+                    ],
+                  ),
                   Container(
                     margin: const EdgeInsets.only(top: 5.0),
                     child: Text(snapshot.value['text']),
