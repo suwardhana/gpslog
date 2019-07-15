@@ -11,16 +11,11 @@ final ThemeData kDefaultTheme = ThemeData(
   accentColor: Colors.orangeAccent[400],
 );
 
-GoogleSignIn _googleSignIn = GoogleSignIn(
-  scopes: <String>[
-    'email',
-    'https://www.googleapis.com/auth/contacts.readonly',
-  ],
-);
+GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 final _auth = FirebaseAuth.instance;
+GoogleSignInAccount user = _googleSignIn.currentUser;
 
 Future<FirebaseUser> _handleSignIn() async {
-  GoogleSignInAccount user = _googleSignIn.currentUser;
   if (user == null) user = await _googleSignIn.signIn();
   final GoogleSignInAuthentication googleAuth = await user.authentication;
 
@@ -181,7 +176,10 @@ class ChatScreenState extends State<ChatScreen> {
     setState(() {
       _isComposing = false;
     });
-    _ensureSignIn();
+    // GoogleSignInAccount user = _googleSignIn.currentUser;
+    // if (user == null) {
+    //   await _handleSignIn();
+    // }
     _sendMessage(text: text);
   }
 
@@ -192,5 +190,6 @@ class ChatScreenState extends State<ChatScreen> {
       'senderName': _googleSignIn.currentUser.displayName,
       'senderPhotoUrl': _googleSignIn.currentUser.photoUrl,
     });
+    debugPrint(_googleSignIn.currentUser.displayName);
   }
 }
