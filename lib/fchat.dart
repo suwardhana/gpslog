@@ -1,46 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 final ThemeData kDefaultTheme = ThemeData(
   primarySwatch: Colors.purple,
   accentColor: Colors.orangeAccent[400],
 );
-
-GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
-final _auth = FirebaseAuth.instance;
-GoogleSignInAccount user = _googleSignIn.currentUser;
-
-Future<FirebaseUser> _handleSignIn() async {
-  if (user == null) user = await _googleSignIn.signIn();
-  final GoogleSignInAuthentication googleAuth = await user.authentication;
-
-  final AuthCredential credential = GoogleAuthProvider.getCredential(
-    accessToken: googleAuth.accessToken,
-    idToken: googleAuth.idToken,
-  );
-
-  final FirebaseUser user2 = await _auth.signInWithCredential(credential);
-  print("signed in " + user2.displayName);
-  await setUsername(user2.displayName);
-  return user2;
-}
-
-setUsername(String _username) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setString('lastlogin', _username);
-}
-
-void _ensureSignIn() async {
-  GoogleSignInAccount user = _googleSignIn.currentUser;
-  if (user == null) {
-    await _handleSignIn();
-  }
-}
 
 final reference = FirebaseDatabase.instance.reference().child('messages');
 
@@ -61,7 +30,7 @@ class ChatMessage extends StatelessWidget {
     if (level > 9) {
       level = 9;
     }
-    debugPrint('badge/lvl' + level.toString() + '.png');
+    // debugPrint('badge/lvl' + level.toString() + '.png');
     return Image.asset(
       'badge/lvl' + level.toString() + '.png',
       width: 25.0,
@@ -183,13 +152,16 @@ class ChatScreenState extends State<ChatScreen> {
     _sendMessage(text: text);
   }
 
-  void _sendMessage({String text}) {
+  void _sendMessage({String text}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('username');
+    String foto = prefs.getString('foto');
+
     reference.push().set({
       'currentPoint': 10,
       'text': text,
-      'senderName': _googleSignIn.currentUser.displayName,
-      'senderPhotoUrl': _googleSignIn.currentUser.photoUrl,
+      'senderName': username,
+      'senderPhotoUrl': foto
     });
-    debugPrint(_googleSignIn.currentUser.displayName);
   }
 }

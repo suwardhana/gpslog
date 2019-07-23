@@ -2,16 +2,63 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../fchat.dart';
 import '../location_stream.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+final _auth = FirebaseAuth.instance;
+GoogleSignInAccount user = _googleSignIn.currentUser;
+
+Future<FirebaseUser> handleSignIn() async {
+  if (user == null) user = await _googleSignIn.signIn();
+  final GoogleSignInAuthentication googleAuth = await user.authentication;
+
+  final AuthCredential credential = GoogleAuthProvider.getCredential(
+    accessToken: googleAuth.accessToken,
+    idToken: googleAuth.idToken,
+  );
+
+  final FirebaseUser user2 = await _auth.signInWithCredential(credential);
+  print("signed in " + user2.displayName);
+  await setUsername(user2.displayName);
+  await setUserfoto(user2.photoUrl);
+  return user2;
+}
+
+setUsername(String _username) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('username', _username);
+}
+
+setUserfoto(String _foto) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('foto', _foto);
+}
+
+getUsername() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  // await prefs.setString('username', _username);
+  return prefs.getString('username').toString();
+}
 
 class BottomWidget extends StatefulWidget {
   BottomWidget({Key key}) : super(key: key);
 
   @override
-  _BottomWidgetState createState() => _BottomWidgetState();
+  _BottomWidgetState createState() {
+    return _BottomWidgetState();
+  }
 }
 
 class _BottomWidgetState extends State<BottomWidget> {
   int _selectedIndex = 0;
+
+  @override
+  initState() {
+    super.initState();
+    handleSignIn();
+  }
+
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   List<Widget> _widgetOptions = <Widget>[
