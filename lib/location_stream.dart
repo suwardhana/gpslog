@@ -57,17 +57,24 @@ class LocationScreenState extends State<LocationScreen> {
   final List<Position> _positions = <Position>[];
 
   void _toggleListening() {
+    debugPrint("button pushed");
+
     if (_positionStreamSubscription == null) {
+      debugPrint("location listening");
       const LocationOptions locationOptions =
           LocationOptions(accuracy: LocationAccuracy.best, distanceFilter: 10);
       final Stream<Position> positionStream =
           Geolocator().getPositionStream(locationOptions);
-      _positionStreamSubscription =
-          positionStream.listen((Position position) => setState(() {
-                _positions.add(position);
-              }));
+      _positionStreamSubscription = positionStream.listen((Position position) {
+        setState(() {
+          _positions.add(position);
+        });
+        _pushLocation(position);
+        debugPrint("location harusnya sudah push");
+      });
       _positionStreamSubscription.pause();
     }
+    debugPrint("location harusnya sudah listening");
 
     setState(() {
       if (_positionStreamSubscription.isPaused) {
@@ -76,6 +83,46 @@ class LocationScreenState extends State<LocationScreen> {
         _positionStreamSubscription.pause();
       }
     });
+  }
+
+  Future<Null> _pushLocation(Position _position) async {
+    List titik = [
+      [-2.9900519, 104.7217054, "rumahku"],
+      [-2.986844, 104.732186, "Gerbang Unsri Palembang"],
+      [-2.989663, 104.735224, "Simpang Padang Selasa"],
+      [-2.992716, 104.726864, "Simpang SMA 10"],
+      [-2.986910, 104.721923, "Jalan Parameswara"],
+      [-3.017649, 104.720889, "Jembatan Musi II"],
+      [-3.047131, 104.744160, "Simpang Kertapati"],
+      [-3.089733, 104.725442, "Simpang Pemulutan"],
+      [-3.179613, 104.678130, "Gerbang Indralaya"],
+      [-3.200429, 104.656830, "Simpang Timbangan"],
+      [-3.210573, 104.648692, "Gerbang Unsri Indralaya"],
+    ];
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String _username = prefs.getString('username').toString() ?? "";
+
+    for (var i = 0; i < titik.length; i++) {
+      double distanceInMeters = await Geolocator().distanceBetween(
+          titik[i][0], titik[i][1], _position.latitude, _position.longitude);
+      if (distanceInMeters < 300) {
+        reference.push().set({
+          'time': _position.timestamp.toLocal().toString(),
+          'username': _username,
+          'nearestradius': titik[i][2],
+          'latitude': _position.latitude,
+          'longitude': _position.longitude,
+        });
+      }
+    }
+    debugPrint("pushlocationfun");
+  }
+
+  getUsername() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String _username = prefs.getString('username').toString() ?? "";
+    return _username;
   }
 
   @override
@@ -145,7 +192,7 @@ class LocationStreamState extends State<LocationStreamWidget> {
         setState(() {
           _positions.add(position);
         });
-        _pushLocation(position, getUsername());
+        _pushLocation(position);
       });
       _positionStreamSubscription.pause();
     }
@@ -159,11 +206,11 @@ class LocationStreamState extends State<LocationStreamWidget> {
     });
   }
 
-  getUsername() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var _username = prefs.getString('username').toString() ?? "";
-    return _username;
-  }
+//  getUsername() async {
+//     SharedPreferences prefs = await SharedPreferences.getInstance();
+//     String _username = prefs.getString('username').toString() ?? "";
+//     return _username.toString();
+//   }
 
   @override
   void dispose() {
@@ -226,8 +273,9 @@ class LocationStreamState extends State<LocationStreamWidget> {
     return _isListening() ? Colors.red : Colors.green;
   }
 
-  Future<Null> _pushLocation(Position position, String username) async {
+  Future<Null> _pushLocation(Position position) async {
     List titik = [
+      [-2.9900519, 104.7217054, "rumahku"],
       [-2.986844, 104.732186, "Gerbang Unsri Palembang"],
       [-2.989663, 104.735224, "Simpang Padang Selasa"],
       [-2.992716, 104.726864, "Simpang SMA 10"],
@@ -239,15 +287,17 @@ class LocationStreamState extends State<LocationStreamWidget> {
       [-3.200429, 104.656830, "Simpang Timbangan"],
       [-3.210573, 104.648692, "Gerbang Unsri Indralaya"],
     ];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String _username = prefs.getString('username').toString() ?? "";
 
     for (var i = 0; i < titik.length; i++) {
       double distanceInMeters = await Geolocator().distanceBetween(
           titik[i][0], titik[i][1], position.latitude, position.longitude);
-      if (distanceInMeters < 150) {
+      if (distanceInMeters < 300) {
         reference.push().set({
           'time': position.timestamp.toLocal().toString(),
-          'username': username,
-          'nearestradius': titik[i][3],
+          'username': _username,
+          'nearestradius': titik[i][2],
           'latitude': position.latitude,
           'longitude': position.longitude,
         });

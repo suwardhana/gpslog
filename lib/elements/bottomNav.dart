@@ -63,7 +63,7 @@ class _BottomWidgetState extends State<BottomWidget> {
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   List<Widget> _widgetOptions = <Widget>[
     ChatScreen(),
-    LocationStreamWidget(),
+    LocationScreen(),
     TesWidget(),
   ];
 
