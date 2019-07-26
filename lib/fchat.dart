@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
 
 final ThemeData kDefaultTheme = ThemeData(
   primarySwatch: Colors.purple,
@@ -12,6 +13,7 @@ final ThemeData kDefaultTheme = ThemeData(
 );
 
 final reference = FirebaseDatabase.instance.reference().child('messages');
+final reference2 = FirebaseDatabase.instance.reference().child('userlocations');
 
 @override
 class ChatMessage extends StatelessWidget {
@@ -84,6 +86,87 @@ class ChatScreen extends StatefulWidget {
 class ChatScreenState extends State<ChatScreen> {
   final TextEditingController _textController = TextEditingController();
   bool _isComposing = false;
+  StreamSubscription<Position> _positionStreamSubscription;
+  final List<Position> _positions = <Position>[];
+
+  void _toggleListening() {
+    debugPrint("button pushed");
+
+    if (_positionStreamSubscription == null) {
+      debugPrint("location listening");
+      const LocationOptions locationOptions =
+          LocationOptions(accuracy: LocationAccuracy.best, distanceFilter: 10);
+      final Stream<Position> positionStream =
+          Geolocator().getPositionStream(locationOptions);
+      _positionStreamSubscription = positionStream.listen((Position position) {
+        setState(() {
+          _positions.add(position);
+        });
+        _pushLocation(position);
+        debugPrint("location harusnya sudah push");
+      });
+      _positionStreamSubscription.pause();
+    }
+    debugPrint("location harusnya sudah listening");
+
+    setState(() {
+      if (_positionStreamSubscription.isPaused) {
+        _positionStreamSubscription.resume();
+      } else {
+        _positionStreamSubscription.pause();
+      }
+    });
+  }
+
+  Future<Null> _pushLocation(Position _position) async {
+    List titik = [
+      [-2.9900519, 104.7217054, "rumahku"],
+      [-2.986844, 104.732186, "Gerbang Unsri Palembang"],
+      [-2.989663, 104.735224, "Simpang Padang Selasa"],
+      [-2.992716, 104.726864, "Simpang SMA 10"],
+      [-2.986910, 104.721923, "Jalan Parameswara"],
+      [-3.017649, 104.720889, "Jembatan Musi II"],
+      [-3.047131, 104.744160, "Simpang Kertapati"],
+      [-3.089733, 104.725442, "Simpang Pemulutan"],
+      [-3.179613, 104.678130, "Gerbang Indralaya"],
+      [-3.200429, 104.656830, "Simpang Timbangan"],
+      [-3.210573, 104.648692, "Gerbang Unsri Indralaya"],
+    ];
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String _username = prefs.getString('username').toString() ?? "";
+
+    for (var i = 0; i < titik.length; i++) {
+      double distanceInMeters = await Geolocator().distanceBetween(
+          titik[i][0], titik[i][1], _position.latitude, _position.longitude);
+      if (distanceInMeters < 300) {
+        reference2.push().set({
+          'time': _position.timestamp.toLocal().toString(),
+          'username': _username,
+          'nearestradius': titik[i][2],
+          'latitude': _position.latitude,
+          'longitude': _position.longitude,
+        });
+      }
+    }
+    debugPrint("pushlocationfun");
+  }
+
+  getUsername() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String _username = prefs.getString('username').toString() ?? "";
+    return _username;
+  }
+
+  @override
+  void dispose() {
+    if (_positionStreamSubscription != null) {
+      _positionStreamSubscription.cancel();
+      _positionStreamSubscription = null;
+    }
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,11 +185,29 @@ class ChatScreenState extends State<ChatScreen> {
         ),
       ),
       Divider(height: 1.0),
+      RaisedButton(
+        child: _buildButtonText(),
+        color: _determineButtonColor(),
+        padding: const EdgeInsets.all(8.0),
+        onPressed: _toggleListening,
+      ),
+      Divider(height: 1.0),
       Container(
         decoration: BoxDecoration(color: Theme.of(context).cardColor),
         child: _buildTextComposer(),
       ),
     ]));
+  }
+
+  bool _isListening() => !(_positionStreamSubscription == null ||
+      _positionStreamSubscription.isPaused);
+
+  Widget _buildButtonText() {
+    return Text(_isListening() ? 'Stop listening' : 'Start listening');
+  }
+
+  Color _determineButtonColor() {
+    return _isListening() ? Colors.red : Colors.green;
   }
 
   Widget _buildTextComposer() {
