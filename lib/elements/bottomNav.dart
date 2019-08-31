@@ -85,16 +85,16 @@ class _BottomWidgetState extends State<BottomWidget> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            title: Text('Home'),
+            icon: Icon(Icons.chat),
+            title: Text('Chat Room'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            title: Text('Business'),
+            icon: Icon(Icons.location_on),
+            title: Text('Location History'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.school),
-            title: Text('School'),
+            icon: Icon(Icons.help_outline),
+            title: Text('Help'),
           ),
         ],
         currentIndex: _selectedIndex,
