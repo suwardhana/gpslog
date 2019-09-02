@@ -37,7 +37,6 @@ setUserfoto(String _foto) async {
 
 getUsername() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  // await prefs.setString('username', _username);
   return prefs.getString('username').toString();
 }
 
@@ -159,6 +158,7 @@ poinLogin() async {
       DateTime.parse(prefs.getString('lastlogin').toString() ?? dateToday);
   // var dateFromPref = DateTime.parse("2019-07-20 20:18:04Z");
   var selisih = dateFromPref.difference(dateToday).inDays;
+  // TODO: tambah 5 poin
 
   print(
       'selisih : $selisih ------- datetoday :  $dateToday ----- lastlogin : $dateFromPref .');
