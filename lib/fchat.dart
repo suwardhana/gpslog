@@ -139,7 +139,7 @@ class ChatScreenState extends State<ChatScreen> {
     for (var i = 0; i < titik.length; i++) {
       double distanceInMeters = await Geolocator().distanceBetween(
           titik[i][0], titik[i][1], _position.latitude, _position.longitude);
-      if (distanceInMeters < 300) {
+      if (distanceInMeters < 150) {
         reference2.push().set({
           'time': _position.timestamp.toLocal().toString(),
           'username': _username,
@@ -147,9 +147,10 @@ class ChatScreenState extends State<ChatScreen> {
           'latitude': _position.latitude,
           'longitude': _position.longitude,
         });
+        _poinPlusTen();
       }
     }
-    debugPrint("pushlocationfun");
+    // debugPrint("pushlocationfun");
   }
 
   getUsername() async {
@@ -164,7 +165,6 @@ class ChatScreenState extends State<ChatScreen> {
       _positionStreamSubscription.cancel();
       _positionStreamSubscription = null;
     }
-
     super.dispose();
   }
 
@@ -246,10 +246,7 @@ class ChatScreenState extends State<ChatScreen> {
     setState(() {
       _isComposing = false;
     });
-    // GoogleSignInAccount user = _googleSignIn.currentUser;
-    // if (user == null) {
-    //   await _handleSignIn();
-    // }
+    _poinPlusOne();
     _sendMessage(text: text);
   }
 
@@ -257,12 +254,26 @@ class ChatScreenState extends State<ChatScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username');
     String foto = prefs.getString('foto');
-
+    int pointBefore = prefs.getInt('point') ?? 0;
     reference.push().set({
-      'currentPoint': 10,
+      'currentPoint': pointBefore,
       'text': text,
       'senderName': username,
       'senderPhotoUrl': foto
     });
+  }
+
+  _poinPlusOne() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int pointBefore = prefs.getInt('point') ?? 0;
+    int currentPoint = pointBefore += 1;
+    await prefs.setInt('point', currentPoint);
+  }
+
+  _poinPlusTen() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int pointBefore = prefs.getInt('point') ?? 0;
+    int currentPoint = pointBefore += 10;
+    await prefs.setInt('point', currentPoint);
   }
 }
