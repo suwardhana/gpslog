@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../fchat.dart';
+import '../mypoint.dart';
 import '../location_stream.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -63,7 +64,7 @@ class _BottomWidgetState extends State<BottomWidget> {
   List<Widget> _widgetOptions = <Widget>[
     ChatScreen(),
     LocationScreen(),
-    TesWidget(),
+    MyPoin(),
   ];
 
   void _onItemTapped(int index) {
