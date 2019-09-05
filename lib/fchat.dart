@@ -24,7 +24,6 @@ class ChatMessage extends StatelessWidget {
     int poin2 = int.parse(poin);
     var level;
     level = poin2 / 10;
-    // debugPrint("level awal = " + level.toString());
     level = level.toInt();
     if (level < 1) {
       level = 1;
@@ -32,7 +31,6 @@ class ChatMessage extends StatelessWidget {
     if (level > 9) {
       level = 9;
     }
-    // debugPrint('badge/lvl' + level.toString() + '.png');
     return Image.asset(
       'badge/lvl' + level.toString() + '.png',
       width: 25.0,
@@ -250,7 +248,7 @@ class ChatScreenState extends State<ChatScreen> {
     _sendMessage(text: text);
   }
 
-  void _sendMessage({String text}) async {
+  _sendMessage({String text}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username');
     String foto = prefs.getString('foto');
