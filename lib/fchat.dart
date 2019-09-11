@@ -145,7 +145,7 @@ class ChatScreenState extends State<ChatScreen> {
           'latitude': _position.latitude,
           'longitude': _position.longitude,
         });
-        _poinPlusTen();
+        _poinPlus(howMuch: 10);
       }
     }
     // debugPrint("pushlocationfun");
@@ -244,7 +244,7 @@ class ChatScreenState extends State<ChatScreen> {
     setState(() {
       _isComposing = false;
     });
-    _poinPlusOne();
+    _poinPlus(howMuch: 1);
     _sendMessage(text: text);
   }
 
@@ -261,17 +261,10 @@ class ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  _poinPlusOne() async {
+  _poinPlus({int howMuch = 1}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int pointBefore = prefs.getInt('point') ?? 0;
-    int currentPoint = pointBefore += 1;
-    await prefs.setInt('point', currentPoint);
-  }
-
-  _poinPlusTen() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int pointBefore = prefs.getInt('point') ?? 0;
-    int currentPoint = pointBefore += 10;
+    int currentPoint = pointBefore += howMuch;
     await prefs.setInt('point', currentPoint);
   }
 }
