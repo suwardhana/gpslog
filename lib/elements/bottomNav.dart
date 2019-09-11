@@ -159,9 +159,16 @@ poinLogin() async {
       DateTime.parse(prefs.getString('lastlogin').toString() ?? dateToday);
   // var dateFromPref = DateTime.parse("2019-07-20 20:18:04Z");
   var selisih = dateFromPref.difference(dateToday).inDays;
-  // TODO: tambah 5 poin
+  _poinPlus(howMuch: 5);
 
   print(
       'selisih : $selisih ------- datetoday :  $dateToday ----- lastlogin : $dateFromPref .');
   await prefs.setString('lastlogin', dateToday.toString());
+}
+
+_poinPlus({int howMuch = 1}) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  int pointBefore = prefs.getInt('point') ?? 0;
+  int currentPoint = pointBefore += howMuch;
+  await prefs.setInt('point', currentPoint);
 }
