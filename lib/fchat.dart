@@ -33,7 +33,7 @@ class ChatMessage extends StatelessWidget {
     }
     return Image.asset(
       'badge/lvl' + level.toString() + '.png',
-      width: 25.0,
+      width: 20.0,
     );
   }
 
@@ -46,18 +46,16 @@ class ChatMessage extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Stack(alignment: AlignmentDirectional.bottomEnd, children: <Widget>[
-              CircleAvatar(
-                  backgroundImage:
-                      NetworkImage(snapshot.value['senderPhotoUrl'])),
-              _gambar(snapshot.value['currentPoint'].toString()),
-            ]),
+            CircleAvatar(
+                backgroundImage:
+                    NetworkImage(snapshot.value['senderPhotoUrl'])),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Row(
                     children: <Widget>[
+                      _gambar(snapshot.value['currentPoint'].toString()),
                       Text(snapshot.value['senderName'],
                           style: Theme.of(context).textTheme.subhead),
                     ],

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+String myPoint = "0";
+
 class MyPoin extends StatefulWidget {
   @override
   _MyPoinState createState() => _MyPoinState();
@@ -34,34 +36,53 @@ class _MyPoinState extends State<MyPoin> {
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Image.asset(
-                    'badge/lvl1.png',
-                    fit: BoxFit.fill,
-                    width: 100.0,
-                    height: 100.0,
-                  )
+                  _gambar(myPoint),
                 ]),
             Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Text(
-                    _getPoin(),
-                    style: TextStyle(
-                        fontSize: 29.0,
-                        color: const Color(0xFF000000),
-                        fontWeight: FontWeight.w200,
-                        fontFamily: "Roboto"),
-                  )
+                  myPointWidget(),
                 ])
           ]),
     );
   }
-}
 
-_getPoin() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  int _point = prefs.getInt('poin') ?? "";
-  return _point;
+  Widget myPointWidget() {
+    _getPoin();
+    return Text(
+      myPoint,
+      style: TextStyle(
+          fontSize: 29.0,
+          color: const Color(0xFF000000),
+          fontWeight: FontWeight.w200,
+          fontFamily: "Roboto"),
+    );
+  }
+
+  Widget _gambar(String poin) {
+    int poin2 = int.parse(poin);
+    var level;
+    level = poin2 / 10;
+    level = level.toInt();
+    if (level < 1) {
+      level = 1;
+    }
+    if (level > 9) {
+      level = 9;
+    }
+    return Image.asset(
+      'badge/lvl' + level.toString() + '.png',
+      width: 50.0,
+    );
+  }
+
+  _getPoin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int _point = prefs.getInt('point') ?? 1;
+    setState(() {
+      myPoint = _point.toString();
+    });
+  }
 }
