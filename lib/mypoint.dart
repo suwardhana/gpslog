@@ -108,12 +108,12 @@ Widget _badgeImage2(int level) {
     v3 = "1 - 19";
   }
   if (level > 8) {
-    v3 = " > 90";
+    v3 = "    > 90";
   }
   return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       mainAxisSize: MainAxisSize.max,
-      crossAxisAlignment: CrossAxisAlignment.center,
+      // crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Image.asset(
           'badge/lvl' + level.toString() + '.png',
