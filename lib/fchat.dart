@@ -100,6 +100,9 @@ class ChatScreenState extends State<ChatScreen> {
         });
         _pushLocation(position);
         debugPrint("location harusnya sudah push");
+        debugPrint(
+            position.latitude.toString() + "," + position.longitude.toString());
+        debugPrint("xx");
       });
       _positionStreamSubscription.pause();
     }
@@ -127,6 +130,7 @@ class ChatScreenState extends State<ChatScreen> {
       [-3.179613, 104.678130, "Gerbang Indralaya"],
       [-3.200429, 104.656830, "Simpang Timbangan"],
       [-3.210573, 104.648692, "Gerbang Unsri Indralaya"],
+      [-3.2200783, 104.6512259, "Fasilkom Indralaya"],
     ];
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -143,7 +147,7 @@ class ChatScreenState extends State<ChatScreen> {
           'latitude': _position.latitude,
           'longitude': _position.longitude,
         });
-        _poinPlus(howMuch: 10);
+        _poinPlus(howMuch: 5);
       }
     }
     // debugPrint("pushlocationfun");
