@@ -1,1 +1,2 @@
-v112 : pindah stream location ke tab chat
+_isComposing?_isListening()?() => _handleSubmitted(_textController.text):null:null
+untuk location on baru bisa chat
